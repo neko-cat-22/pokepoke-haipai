@@ -2,57 +2,51 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ポケモン風カード管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ポケモンカード風管理サイト</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="main-container">
-    <!-- メイン画面 -->
-    <section class="battle-area">
-      <h2>メイン画面</h2>
-
+    <section class="game-area">
       <div class="field">
-        <div class="opponent-area">
-          <h3>相手の場</h3>
-          <div class="bench" id="opponent-bench">
+        <div class="player-field">
+          <div class="active-slot" id="opponent-active">バトルポケモン（相手）</div>
+          <div class="bench-row">
             <div class="bench-slot" data-side="opponent" data-index="0"></div>
             <div class="bench-slot" data-side="opponent" data-index="1"></div>
             <div class="bench-slot" data-side="opponent" data-index="2"></div>
           </div>
-          <div class="active" id="opponent-active">バトルポケモン（相手）</div>
-        </div>
 
-        <div class="player-area">
-          <h3>自分の場</h3>
-          <div class="active" id="player-active">バトルポケモン（自分）</div>
-          <div class="bench" id="player-bench">
+          <div class="active-slot" id="player-active">バトルポケモン（自分）</div>
+          <div class="bench-row">
             <div class="bench-slot" data-side="player" data-index="0"></div>
             <div class="bench-slot" data-side="player" data-index="1"></div>
             <div class="bench-slot" data-side="player" data-index="2"></div>
           </div>
         </div>
+
+        <div class="hand-info">
+          自分の手札: <span id="player-hand-count">0</span>枚 /
+          相手の手札: <span id="opponent-hand-count">0</span>枚
+        </div>
       </div>
 
-      <div class="hands-info">
-        <div>自分の手札: <span id="player-hand-count">0</span>枚</div>
-        <div>相手の手札: <span id="opponent-hand-count">0</span>枚</div>
-        <div>自分のデッキ: <button id="view-deck">表示</button></div>
-        <div>自分のトラッシュ: <button id="view-trash">表示</button></div>
-        <div>相手のトラッシュ: <button id="view-opponent-trash">表示</button></div>
-        <div>次のエネルギー（自分）:<span id="player-next-energy">緑</span></div>
-        <div>次のエネルギー（相手）:<span id="opponent-next-energy">赤</span></div>
-      </div>
-
-      <button id="log-action">操作ログに記録</button>
-    </section>
-
-    <!-- タイムライン -->
-    <section class="timeline">
-      <h2>タイムライン（操作ログ）</h2>
-      <div id="timeline-container"></div>
+      <aside class="timeline">
+        <h2>タイムライン</h2>
+        <ul id="log-list"></ul>
+      </aside>
     </section>
   </main>
+
+  <!-- カード一覧モーダル -->
+  <div id="card-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>カードを選択</h3>
+      <div id="card-list" class="card-list"></div>
+      <button onclick="closeCardModal()">キャンセル</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
