@@ -6,65 +6,97 @@ body {
 
 .main-container {
   display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.game-area {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
   flex-wrap: wrap;
-  padding: 10px;
-}
-
-.battle-area, .timeline {
-  flex: 1 1 100%;
-  padding: 10px;
-}
-
-@media (min-width: 768px) {
-  .battle-area {
-    flex: 2 1 60%;
-  }
-  .timeline {
-    flex: 1 1 40%;
-  }
 }
 
 .field {
+  flex: 2;
+  border: 2px solid #ccc;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.player-field {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
 
-.bench, .active {
+.bench-row {
   display: flex;
-  gap: 10px;
-  padding: 5px;
-  border: 1px dashed #ccc;
-  min-height: 50px;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.bench-slot {
-  flex: 1;
-  height: 50px;
-  background-color: #eee;
+.bench-slot, .active-slot {
+  border: 1px dashed #666;
+  padding: 1rem;
   text-align: center;
-  line-height: 50px;
-  border: 1px solid #aaa;
+  min-height: 60px;
+  flex: 1;
+  background-color: #f9f9f9;
+  cursor: pointer;
 }
 
-.hands-info {
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-#timeline-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.timeline {
+  flex: 1;
+  border: 2px solid #999;
+  padding: 1rem;
+  border-radius: 10px;
   max-height: 400px;
   overflow-y: auto;
 }
 
-.timeline-entry {
-  background: #fdfdfd;
-  border: 1px solid #ccc;
-  padding: 5px;
-  font-size: 14px;
+#log-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* モーダル */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+  width: 90%;
+  max-width: 500px;
+}
+
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.card-list div {
+  border: 1px solid #333;
+  padding: 0.5rem;
+  cursor: pointer;
+  background: #eee;
 }
