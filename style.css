@@ -1,0 +1,70 @@
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.main-container {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.battle-area, .timeline {
+  flex: 1 1 100%;
+  padding: 10px;
+}
+
+@media (min-width: 768px) {
+  .battle-area {
+    flex: 2 1 60%;
+  }
+  .timeline {
+    flex: 1 1 40%;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bench, .active {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  border: 1px dashed #ccc;
+  min-height: 50px;
+}
+
+.bench-slot {
+  flex: 1;
+  height: 50px;
+  background-color: #eee;
+  text-align: center;
+  line-height: 50px;
+  border: 1px solid #aaa;
+}
+
+.hands-info {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.timeline-entry {
+  background: #fdfdfd;
+  border: 1px solid #ccc;
+  padding: 5px;
+  font-size: 14px;
+}
