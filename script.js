@@ -1,64 +1,25 @@
-const gameState = {
-  player: {
-    active: null,
-    bench: [null, null, null],
-    handCount: 5,
-  },
-  opponent: {
-    active: null,
-    bench: [null, null, null],
-    handCount: 5,
-  },
-  log: [],
-  cardPlacementTarget: null,
-};
-
 const sampleCards = [
-  { id: 1, name: "フシギダネ", type: "草", hp: 60, category: "ポケモン", evolution: "たね" },
-  { id: 2, name: "ヒトカゲ", type: "炎", hp: 50, category: "ポケモン", evolution: "たね" },
-  { id: 3, name: "ゼニガメ", type: "水", hp: 70, category: "ポケモン", evolution: "たね" },
-  { id: 4, name: "モンスターボール", type: "無", hp: 0, category: "グッズ" }
+  { name: "フシギダネ", type: "草", hp: 60, category: "ポケモン", evolution: "たね" },
+  { name: "ヒトカゲ", type: "炎", hp: 50, category: "ポケモン", evolution: "たね" },
+  { name: "ゼニガメ", type: "水", hp: 50, category: "ポケモン", evolution: "たね" },
+  { name: "ピカチュウ", type: "雷", hp: 60, category: "ポケモン", evolution: "たね" },
 ];
 
-function renderField() {
-  document.getElementById("player-active").textContent =
-    gameState.player.active
-      ? `${gameState.player.active.name} (HP:${gameState.player.active.hp})`
-      : "バトルポケモン（自分）";
+let currentTargetSlot = null;
+let fieldState = {}; // slotId => { name, hp, energies: [] }
 
-  document.getElementById("opponent-active").textContent =
-    gameState.opponent.active
-      ? `${gameState.opponent.active.name} (HP:${gameState.opponent.active.hp})`
-      : "バトルポケモン（相手）";
-
-  document.getElementById("player-hand-count").textContent = gameState.player.handCount;
-  document.getElementById("opponent-hand-count").textContent = gameState.opponent.handCount;
-
-  ["player", "opponent"].forEach(side => {
-    gameState[side].bench.forEach((card, i) => {
-      const slot = document.querySelector(`.bench-slot[data-side="${side}"][data-index="${i}"]`);
-      slot.textContent = card ? card.name : "";
-      if (side === "player") {
-        slot.onclick = () => openCardModal(side, "bench", i);
-      }
-    });
-
-    const activeEl = document.getElementById(`${side}-active`);
-    if (side === "player") {
-      activeEl.onclick = () => openCardModal(side, "active");
-    }
-  });
-}
-
-function openCardModal(side, area, index = null) {
-  gameState.cardPlacementTarget = { side, area, index };
+function openCardModal(slotElement) {
+  currentTargetSlot = slotElement;
   const cardList = document.getElementById("card-list");
   cardList.innerHTML = "";
 
   sampleCards.forEach(card => {
     const div = document.createElement("div");
-    div.textContent = `${card.name} (${card.type})`;
-    div.onclick = () => selectCard(card);
+    div.textContent = `${card.name}（HP: ${card.hp}）`;
+    div.onclick = () => {
+      setCardInSlot(slotElement, card);
+      closeCardModal();
+    };
     cardList.appendChild(div);
   });
 
@@ -67,30 +28,82 @@ function openCardModal(side, area, index = null) {
 
 function closeCardModal() {
   document.getElementById("card-modal").classList.add("hidden");
-  gameState.cardPlacementTarget = null;
 }
 
-function selectCard(card) {
-  const { side, area, index } = gameState.cardPlacementTarget;
-  if (area === "bench") {
-    gameState[side].bench[index] = card;
-    addLogEntry(`${side === "player" ? "自分" : "相手"}のベンチ${index + 1}に${card.name}を配置`);
-  } else if (area === "active") {
-    gameState[side].active = card;
-    addLogEntry(`${side === "player" ? "自分" : "相手"}のバトル場に${card.name}を配置`);
-  }
-
-  closeCardModal();
-  renderField();
+function setCardInSlot(slot, card) {
+  const slotId = slot.getAttribute("id") || `${slot.dataset.side}-${slot.dataset.index}`;
+  fieldState[slotId] = { name: card.name, hp: card.hp, energies: [] };
+  renderSlot(slot, slotId);
+  logAction(`${slotId} に ${card.name} を配置`);
 }
 
-function addLogEntry(text) {
-  gameState.log.push(text);
-  const logList = document.getElementById("log-list");
-  const li = document.createElement("li");
-  li.textContent = text;
-  logList.appendChild(li);
+function renderSlot(slot, slotId) {
+  const state = fieldState[slotId];
+  slot.innerHTML = "";
+
+  const content = document.createElement("div");
+  content.className = "card-content";
+
+  const nameEl = document.createElement("div");
+  nameEl.textContent = state.name;
+  const hpEl = document.createElement("div");
+  hpEl.textContent = `HP: ${state.hp}`;
+  hpEl.className = "card-hp";
+
+  const energyEl = document.createElement("div");
+  energyEl.className = "card-energies";
+  state.energies.forEach(type => {
+    const circle = document.createElement("div");
+    circle.className = `energy-circle ${getEnergyClass(type)}`;
+    energyEl.appendChild(circle);
+  });
+
+  content.appendChild(nameEl);
+  content.appendChild(hpEl);
+  content.appendChild(energyEl);
+  slot.appendChild(content);
+
+  slot.onclick = () => openEnergyModal(slotId);
 }
 
-// 初期表示
-renderField();
+function openEnergyModal(slotId) {
+  currentTargetSlot = slotId;
+  document.getElementById("energy-modal").classList.remove("hidden");
+}
+
+function closeEnergyModal() {
+  document.getElementById("energy-modal").classList.add("hidden");
+}
+
+document.querySelectorAll(".bench-slot, .active-slot").forEach(slot => {
+  slot.onclick = () => openCardModal(slot);
+});
+
+document.querySelectorAll(".energy-options .energy-circle").forEach(btn => {
+  btn.onclick = () => {
+    const type = btn.dataset.type;
+    const state = fieldState[currentTargetSlot];
+    if (state) {
+      state.energies.push(type);
+      const slotEl = document.querySelector(
+        `[id="${currentTargetSlot}"], [data-side][data-index="${currentTargetSlot.split("-")[1]}"]`
+      );
+      renderSlot(slotEl, currentTargetSlot);
+      logAction(`${state.name} に ${type}エネルギーを追加`);
+    }
+    closeEnergyModal();
+  };
+});
+
+function getEnergyClass(type) {
+  return {
+    "草": "grass", "炎": "fire", "水": "water", "雷": "lightning",
+    "超": "psychic", "闘": "fighting", "悪": "dark", "鋼": "steel"
+  }[type] || "";
+}
+
+function logAction(text) {
+  const log = document.createElement("li");
+  log.textContent = text;
+  document.getElementById("log-list").appendChild(log);
+}
