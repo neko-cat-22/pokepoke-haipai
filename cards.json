@@ -1,7 +1,34 @@
-const allCards = [
-  { name: "フシギダネ", type: "草", hp: 60, category: "ポケモン", evo: "たね" },
-  { name: "ヒトカゲ", type: "炎", hp: 60, category: "ポケモン", evo: "たね" },
-  { name: "ゼニガメ", type: "水", hp: 60, category: "ポケモン", evo: "たね" },
-  { name: "ピカチュウ", type: "雷", hp: 60, category: "ポケモン", evo: "たね" },
-  { name: "ポーション", type: "", hp: 0, category: "グッズ" }
-];
+[
+  {
+    "id": 1,
+    "name": "フシギダネ",
+    "type": "grass",
+    "hp": 60,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 2,
+    "name": "ヒトカゲ",
+    "type": "fire",
+    "hp": 50,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 3,
+    "name": "ゼニガメ",
+    "type": "water",
+    "hp": 50,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 4,
+    "name": "ピカチュウ",
+    "type": "electric",
+    "hp": 60,
+    "category": "ポケモン",
+    "stage": "たね"
+  }
+]
