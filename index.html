@@ -2,67 +2,35 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ポケモンカード風管理サイト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ポケモンカード風サイト</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="main-container">
-    <section class="game-area">
-      <div class="field">
-        <div class="player-field">
-          <div class="bench-row">
-            <div class="bench-slot" data-side="opponent" data-index="0"></div>
-            <div class="bench-slot" data-side="opponent" data-index="1"></div>
-            <div class="bench-slot" data-side="opponent" data-index="2"></div>
-          </div>
-          <div class="active-slot" id="opponent-active">バトルポケモン（相手）</div>
-
-          <div class="active-slot" id="player-active">バトルポケモン（自分）</div>
-          <div class="bench-row">
-            <div class="bench-slot" data-side="player" data-index="0"></div>
-            <div class="bench-slot" data-side="player" data-index="1"></div>
-            <div class="bench-slot" data-side="player" data-index="2"></div>
-          </div>
-        </div>
-
-        <div class="hand-info">
-          自分の手札: <span id="player-hand-count">0</span>枚 /
-          相手の手札: <span id="opponent-hand-count">0</span>枚
-        </div>
+  <div id="app">
+    <div id="main-screen">
+      <div class="field opponent">
+        <div class="bench" id="opponent-bench"></div>
+        <div class="battle" id="opponent-battle"></div>
       </div>
-
-      <aside class="timeline">
-        <h2>タイムライン</h2>
-        <ul id="log-list"></ul>
-      </aside>
-    </section>
-  </main>
-
-  <!-- カード一覧モーダル -->
-  <div id="card-modal" class="modal hidden">
-    <div class="modal-content">
-      <h3>カードを選択</h3>
-      <div id="card-list" class="card-list"></div>
-      <button onclick="closeCardModal()">キャンセル</button>
+      <div class="field player">
+        <div class="battle" id="player-battle"></div>
+        <div class="bench" id="player-bench"></div>
+      </div>
+      <button id="open-card-list">カード一覧</button>
     </div>
-  </div>
 
-  <!-- エネルギー追加モーダル -->
-  <div id="energy-modal" class="modal hidden">
-    <div class="modal-content">
-      <h3>エネルギーを追加</h3>
-      <div class="energy-options">
-        <button class="energy-circle grass" data-type="草"></button>
-        <button class="energy-circle fire" data-type="炎"></button>
-        <button class="energy-circle water" data-type="水"></button>
-        <button class="energy-circle lightning" data-type="雷"></button>
-        <button class="energy-circle psychic" data-type="超"></button>
-        <button class="energy-circle fighting" data-type="闘"></button>
-        <button class="energy-circle dark" data-type="悪"></button>
-        <button class="energy-circle steel" data-type="鋼"></button>
+    <div id="timeline">
+      <h2>タイムライン</h2>
+      <ul id="log-list"></ul>
+    </div>
+
+    <div id="card-list-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>カード一覧</h2>
+        <div id="card-list"></div>
+        <button id="close-card-list">閉じる</button>
       </div>
-      <button onclick="closeEnergyModal()">キャンセル</button>
     </div>
   </div>
 
