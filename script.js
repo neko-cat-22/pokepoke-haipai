@@ -1,116 +1,156 @@
-let cards = [];
+const timeline = [];
+const playerBench = ["", "", ""];
+const opponentBench = ["", "", ""];
+let playerBattle = "";
+let opponentBattle = "";
 let selectedSlot = null;
 
-// カードデータを外部から読み込み
-fetch('cards.json')
-  .then(res => res.json())
-  .then(data => {
-    cards = data;
-    initBoard();
-    setupEvents();
+function renderField() {
+  const pb = document.getElementById("player-bench");
+  const ob = document.getElementById("opponent-bench");
+  const pbattle = document.getElementById("player-battle");
+  const obattle = document.getElementById("opponent-battle");
+
+  pb.innerHTML = "";
+  ob.innerHTML = "";
+
+  playerBench.forEach((card, i) => {
+    const slot = createSlot(card, "player-bench", i);
+    pb.appendChild(slot);
   });
 
-function initBoard() {
-  const playerBench = document.getElementById("player-bench");
-  const playerBattle = document.getElementById("player-battle");
-  const opponentBench = document.getElementById("opponent-bench");
-  const opponentBattle = document.getElementById("opponent-battle");
+  opponentBench.forEach((card, i) => {
+    const slot = createSlot(card, "opponent-bench", i);
+    ob.appendChild(slot);
+  });
 
-  playerBench.innerHTML = '';
-  playerBattle.innerHTML = '';
-  opponentBench.innerHTML = '';
-  opponentBattle.innerHTML = '';
+  pbattle.innerHTML = "";
+  obattle.innerHTML = "";
 
-  for (let i = 0; i < 3; i++) {
-    playerBench.appendChild(createCardSlot('player-bench', i));
-    opponentBench.appendChild(createCardSlot('opponent-bench', i));
-  }
-
-  playerBattle.appendChild(createCardSlot('player-battle', 0));
-  opponentBattle.appendChild(createCardSlot('opponent-battle', 0));
+  pbattle.appendChild(createSlot(playerBattle, "player-battle", 0));
+  obattle.appendChild(createSlot(opponentBattle, "opponent-battle", 0));
 }
 
-function createCardSlot(area, index) {
+function createSlot(cardData, area, index) {
   const slot = document.createElement("div");
-  slot.classList.add("card-slot");
-  slot.dataset.area = area;
-  slot.dataset.index = index;
-  slot.addEventListener("click", () => {
-    selectedSlot = slot;
-    openCardList();
-  });
+  slot.className = "slot";
+  slot.onclick = (e) => onSlotClick(e, area, index);
+
+  if (cardData && cardData.name) {
+    slot.innerHTML = `<strong>${cardData.name}</strong><br/>HP: ${cardData.hp}`;
+    const energyRow = document.createElement("div");
+    (cardData.energy || []).forEach(type => {
+      const circle = document.createElement("div");
+      circle.className = "energy-icon";
+      circle.style.background = getEnergyColor(type);
+      energyRow.appendChild(circle);
+    });
+    slot.appendChild(energyRow);
+  }
+
   return slot;
 }
 
-function openCardList() {
-  const modal = document.getElementById("card-list-modal");
-  const list = document.getElementById("card-list");
-  list.innerHTML = '';
+function getEnergyColor(type) {
+  return {
+    "草": "green", "炎": "red", "水": "skyblue", "雷": "yellow",
+    "超": "purple", "闘": "orange", "悪": "darkblue", "鋼": "silver"
+  }[type] || "gray";
+}
 
-  cards.forEach((card, idx) => {
-    const div = document.createElement("div");
-    div.textContent = `${card.name} (${card.hp})`;
-    div.style.cursor = 'pointer';
-    div.style.margin = '5px 0';
-    div.addEventListener("click", () => {
-      setCardToSlot(selectedSlot, card);
-      logAction(`${selectedSlot.dataset.area} に ${card.name} を配置`);
-      closeCardList();
-    });
-    list.appendChild(div);
+function onSlotClick(event, area, index) {
+  event.stopPropagation();
+  const target = getCardInArea(area, index);
+
+  if (!target || !target.name) {
+    openCardSelector(area, index);
+  } else {
+    selectedSlot = { area, index };
+    showContextMenu(event.pageX, event.pageY);
+  }
+}
+
+function getCardInArea(area, index) {
+  if (area === "player-bench") return playerBench[index];
+  if (area === "opponent-bench") return opponentBench[index];
+  if (area === "player-battle") return playerBattle;
+  if (area === "opponent-battle") return opponentBattle;
+}
+
+function setCardInArea(area, index, card) {
+  if (area === "player-bench") playerBench[index] = card;
+  else if (area === "opponent-bench") opponentBench[index] = card;
+  else if (area === "player-battle") playerBattle = card;
+  else if (area === "opponent-battle") opponentBattle = card;
+}
+
+function openCardSelector(area, index) {
+  const selector = document.getElementById("card-selector");
+  selector.innerHTML = "<h3>カードを選択</h3>";
+  allCards.forEach(card => {
+    const btn = document.createElement("button");
+    btn.textContent = card.name;
+    btn.onclick = () => {
+      const newCard = { ...card, energy: [] };
+      setCardInArea(area, index, newCard);
+      logTimeline(`${card.name} を ${area} に配置`);
+      selector.style.display = "none";
+      renderField();
+    };
+    selector.appendChild(btn);
   });
-
-  modal.classList.remove("hidden");
+  selector.style.display = "block";
 }
 
-function closeCardList() {
-  document.getElementById("card-list-modal").classList.add("hidden");
+function showContextMenu(x, y) {
+  const menu = document.getElementById("context-menu");
+  menu.style.display = "block";
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
 }
 
-function setCardToSlot(slot, card) {
-  slot.innerHTML = '';
-  const name = document.createElement("div");
-  name.textContent = card.name;
-  name.className = "card-name";
-  slot.appendChild(name);
+function selectAction(action) {
+  const { area, index } = selectedSlot;
+  const card = getCardInArea(area, index);
 
-  const hp = document.createElement("div");
-  hp.textContent = `HP: ${card.hp}`;
-  slot.appendChild(hp);
+  if (action === "energy") {
+    showEnergySelector();
+  }
 
-  const energyBar = document.createElement("div");
-  energyBar.className = "energy-icons";
-  slot.appendChild(energyBar);
+  if (action === "trash") {
+    setCardInArea(area, index, "");
+    logTimeline(`${card.name} をトラッシュ`);
+    renderField();
+  }
 
-  const types = ['grass', 'fire', 'water', 'electric', 'psychic', 'fighting', 'dark', 'steel'];
-  types.forEach(type => {
-    const dot = document.createElement("div");
-    dot.classList.add("energy", type);
-    dot.addEventListener("click", () => {
-      const clone = dot.cloneNode();
-      energyBar.appendChild(clone);
-      logAction(`${card.name} にエネルギー(${type})を追加`);
-    });
-    slot.appendChild(dot);
+  document.getElementById("context-menu").style.display = "none";
+}
+
+function showEnergySelector() {
+  const selector = document.getElementById("energy-selector");
+  selector.innerHTML = "";
+  ["草", "炎", "水", "雷", "超", "闘", "悪", "鋼"].forEach(type => {
+    const btn = document.createElement("button");
+    btn.textContent = type;
+    btn.onclick = () => {
+      const card = getCardInArea(selectedSlot.area, selectedSlot.index);
+      if (!card.energy) card.energy = [];
+      card.energy.push(type);
+      logTimeline(`${card.name} に ${type}エネルギーを付けた`);
+      selector.style.display = "none";
+      renderField();
+    };
+    selector.appendChild(btn);
   });
-
-  slot.dataset.cardId = card.id;
+  selector.style.display = "flex";
 }
 
-function setupEvents() {
-  document.getElementById("open-card-list").addEventListener("click", () => {
-    selectedSlot = null;
-    openCardList();
-  });
-
-  document.getElementById("close-card-list").addEventListener("click", () => {
-    closeCardList();
-  });
+function logTimeline(text) {
+  timeline.push(text);
+  const log = document.getElementById("timeline-log");
+  const item = document.createElement("li");
+  item.textContent = text;
+  log.appendChild(item);
 }
 
-function logAction(text) {
-  const logList = document.getElementById("log-list");
-  const li = document.createElement("li");
-  li.textContent = text;
-  logList.appendChild(li);
-}
+renderField();
