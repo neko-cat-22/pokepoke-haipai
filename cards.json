@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "フシギダネ",
+    "type": "grass",
+    "hp": 60,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 2,
+    "name": "ヒトカゲ",
+    "type": "fire",
+    "hp": 50,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 3,
+    "name": "ゼニガメ",
+    "type": "water",
+    "hp": 50,
+    "category": "ポケモン",
+    "stage": "たね"
+  },
+  {
+    "id": 4,
+    "name": "ピカチュウ",
+    "type": "electric",
+    "hp": 60,
+    "category": "ポケモン",
+    "stage": "たね"
+  }
+]
