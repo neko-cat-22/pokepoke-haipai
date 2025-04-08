@@ -1,109 +1,116 @@
-const sampleCards = [
-  { name: "フシギダネ", type: "草", hp: 60, category: "ポケモン", evolution: "たね" },
-  { name: "ヒトカゲ", type: "炎", hp: 50, category: "ポケモン", evolution: "たね" },
-  { name: "ゼニガメ", type: "水", hp: 50, category: "ポケモン", evolution: "たね" },
-  { name: "ピカチュウ", type: "雷", hp: 60, category: "ポケモン", evolution: "たね" },
-];
+let cards = [];
+let selectedSlot = null;
 
-let currentTargetSlot = null;
-let fieldState = {}; // slotId => { name, hp, energies: [] }
+// カードデータを外部から読み込み
+fetch('cards.json')
+  .then(res => res.json())
+  .then(data => {
+    cards = data;
+    initBoard();
+    setupEvents();
+  });
 
-function openCardModal(slotElement) {
-  currentTargetSlot = slotElement;
-  const cardList = document.getElementById("card-list");
-  cardList.innerHTML = "";
+function initBoard() {
+  const playerBench = document.getElementById("player-bench");
+  const playerBattle = document.getElementById("player-battle");
+  const opponentBench = document.getElementById("opponent-bench");
+  const opponentBattle = document.getElementById("opponent-battle");
 
-  sampleCards.forEach(card => {
+  playerBench.innerHTML = '';
+  playerBattle.innerHTML = '';
+  opponentBench.innerHTML = '';
+  opponentBattle.innerHTML = '';
+
+  for (let i = 0; i < 3; i++) {
+    playerBench.appendChild(createCardSlot('player-bench', i));
+    opponentBench.appendChild(createCardSlot('opponent-bench', i));
+  }
+
+  playerBattle.appendChild(createCardSlot('player-battle', 0));
+  opponentBattle.appendChild(createCardSlot('opponent-battle', 0));
+}
+
+function createCardSlot(area, index) {
+  const slot = document.createElement("div");
+  slot.classList.add("card-slot");
+  slot.dataset.area = area;
+  slot.dataset.index = index;
+  slot.addEventListener("click", () => {
+    selectedSlot = slot;
+    openCardList();
+  });
+  return slot;
+}
+
+function openCardList() {
+  const modal = document.getElementById("card-list-modal");
+  const list = document.getElementById("card-list");
+  list.innerHTML = '';
+
+  cards.forEach((card, idx) => {
     const div = document.createElement("div");
-    div.textContent = `${card.name}（HP: ${card.hp}）`;
-    div.onclick = () => {
-      setCardInSlot(slotElement, card);
-      closeCardModal();
-    };
-    cardList.appendChild(div);
+    div.textContent = `${card.name} (${card.hp})`;
+    div.style.cursor = 'pointer';
+    div.style.margin = '5px 0';
+    div.addEventListener("click", () => {
+      setCardToSlot(selectedSlot, card);
+      logAction(`${selectedSlot.dataset.area} に ${card.name} を配置`);
+      closeCardList();
+    });
+    list.appendChild(div);
   });
 
-  document.getElementById("card-modal").classList.remove("hidden");
+  modal.classList.remove("hidden");
 }
 
-function closeCardModal() {
-  document.getElementById("card-modal").classList.add("hidden");
+function closeCardList() {
+  document.getElementById("card-list-modal").classList.add("hidden");
 }
 
-function setCardInSlot(slot, card) {
-  const slotId = slot.getAttribute("id") || `${slot.dataset.side}-${slot.dataset.index}`;
-  fieldState[slotId] = { name: card.name, hp: card.hp, energies: [] };
-  renderSlot(slot, slotId);
-  logAction(`${slotId} に ${card.name} を配置`);
-}
+function setCardToSlot(slot, card) {
+  slot.innerHTML = '';
+  const name = document.createElement("div");
+  name.textContent = card.name;
+  name.className = "card-name";
+  slot.appendChild(name);
 
-function renderSlot(slot, slotId) {
-  const state = fieldState[slotId];
-  slot.innerHTML = "";
+  const hp = document.createElement("div");
+  hp.textContent = `HP: ${card.hp}`;
+  slot.appendChild(hp);
 
-  const content = document.createElement("div");
-  content.className = "card-content";
+  const energyBar = document.createElement("div");
+  energyBar.className = "energy-icons";
+  slot.appendChild(energyBar);
 
-  const nameEl = document.createElement("div");
-  nameEl.textContent = state.name;
-  const hpEl = document.createElement("div");
-  hpEl.textContent = `HP: ${state.hp}`;
-  hpEl.className = "card-hp";
-
-  const energyEl = document.createElement("div");
-  energyEl.className = "card-energies";
-  state.energies.forEach(type => {
-    const circle = document.createElement("div");
-    circle.className = `energy-circle ${getEnergyClass(type)}`;
-    energyEl.appendChild(circle);
+  const types = ['grass', 'fire', 'water', 'electric', 'psychic', 'fighting', 'dark', 'steel'];
+  types.forEach(type => {
+    const dot = document.createElement("div");
+    dot.classList.add("energy", type);
+    dot.addEventListener("click", () => {
+      const clone = dot.cloneNode();
+      energyBar.appendChild(clone);
+      logAction(`${card.name} にエネルギー(${type})を追加`);
+    });
+    slot.appendChild(dot);
   });
 
-  content.appendChild(nameEl);
-  content.appendChild(hpEl);
-  content.appendChild(energyEl);
-  slot.appendChild(content);
-
-  slot.onclick = () => openEnergyModal(slotId);
+  slot.dataset.cardId = card.id;
 }
 
-function openEnergyModal(slotId) {
-  currentTargetSlot = slotId;
-  document.getElementById("energy-modal").classList.remove("hidden");
-}
+function setupEvents() {
+  document.getElementById("open-card-list").addEventListener("click", () => {
+    selectedSlot = null;
+    openCardList();
+  });
 
-function closeEnergyModal() {
-  document.getElementById("energy-modal").classList.add("hidden");
-}
-
-document.querySelectorAll(".bench-slot, .active-slot").forEach(slot => {
-  slot.onclick = () => openCardModal(slot);
-});
-
-document.querySelectorAll(".energy-options .energy-circle").forEach(btn => {
-  btn.onclick = () => {
-    const type = btn.dataset.type;
-    const state = fieldState[currentTargetSlot];
-    if (state) {
-      state.energies.push(type);
-      const slotEl = document.querySelector(
-        `[id="${currentTargetSlot}"], [data-side][data-index="${currentTargetSlot.split("-")[1]}"]`
-      );
-      renderSlot(slotEl, currentTargetSlot);
-      logAction(`${state.name} に ${type}エネルギーを追加`);
-    }
-    closeEnergyModal();
-  };
-});
-
-function getEnergyClass(type) {
-  return {
-    "草": "grass", "炎": "fire", "水": "water", "雷": "lightning",
-    "超": "psychic", "闘": "fighting", "悪": "dark", "鋼": "steel"
-  }[type] || "";
+  document.getElementById("close-card-list").addEventListener("click", () => {
+    closeCardList();
+  });
 }
 
 function logAction(text) {
-  const log = document.createElement("li");
-  log.textContent = text;
-  document.getElementById("log-list").appendChild(log);
+  const logList = document.getElementById("log-list");
+  const li = document.createElement("li");
+  li.textContent = text;
+  logList.appendChild(li);
 }
