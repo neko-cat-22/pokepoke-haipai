@@ -11,7 +11,6 @@
     <section class="game-area">
       <div class="field">
         <div class="player-field">
-          <!-- 変更後の順番 -->
           <div class="bench-row">
             <div class="bench-slot" data-side="opponent" data-index="0"></div>
             <div class="bench-slot" data-side="opponent" data-index="1"></div>
@@ -46,6 +45,24 @@
       <h3>カードを選択</h3>
       <div id="card-list" class="card-list"></div>
       <button onclick="closeCardModal()">キャンセル</button>
+    </div>
+  </div>
+
+  <!-- エネルギー追加モーダル -->
+  <div id="energy-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>エネルギーを追加</h3>
+      <div class="energy-options">
+        <button class="energy-circle grass" data-type="草"></button>
+        <button class="energy-circle fire" data-type="炎"></button>
+        <button class="energy-circle water" data-type="水"></button>
+        <button class="energy-circle lightning" data-type="雷"></button>
+        <button class="energy-circle psychic" data-type="超"></button>
+        <button class="energy-circle fighting" data-type="闘"></button>
+        <button class="energy-circle dark" data-type="悪"></button>
+        <button class="energy-circle steel" data-type="鋼"></button>
+      </div>
+      <button onclick="closeEnergyModal()">キャンセル</button>
     </div>
   </div>
 
