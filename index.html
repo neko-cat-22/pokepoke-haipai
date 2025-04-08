@@ -7,33 +7,35 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="app">
-    <div id="main-screen">
-      <div class="field opponent">
-        <div class="bench" id="opponent-bench"></div>
-        <div class="battle" id="opponent-battle"></div>
+  <div id="main">
+    <h1>ポケモンカード バトル場</h1>
+
+    <div class="field">
+      <div class="bench-row" id="opponent-bench"></div>
+      <div class="battle-row">
+        <div class="battle-slot" id="opponent-battle"></div>
       </div>
-      <div class="field player">
-        <div class="battle" id="player-battle"></div>
-        <div class="bench" id="player-bench"></div>
+      <div class="battle-row">
+        <div class="battle-slot" id="player-battle"></div>
       </div>
-      <button id="open-card-list">カード一覧</button>
+      <div class="bench-row" id="player-bench"></div>
     </div>
 
-    <div id="timeline">
+    <div class="timeline">
       <h2>タイムライン</h2>
-      <ul id="log-list"></ul>
+      <ul id="timeline-log"></ul>
     </div>
 
-    <div id="card-list-modal" class="modal hidden">
-      <div class="modal-content">
-        <h2>カード一覧</h2>
-        <div id="card-list"></div>
-        <button id="close-card-list">閉じる</button>
-      </div>
+    <div class="card-selector" id="card-selector"></div>
+    <div class="context-menu" id="context-menu">
+      <button onclick="selectAction('energy')">エネルギーを付ける</button>
+      <button onclick="selectAction('hp')">体力を操作する</button>
+      <button onclick="selectAction('trash')">トラッシュに送る</button>
     </div>
+    <div class="energy-selector" id="energy-selector"></div>
   </div>
 
+  <script src="cards.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
