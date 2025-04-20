@@ -2,75 +2,72 @@ body {
   font-family: sans-serif;
   margin: 0;
   padding: 0;
-  background: #f5f5f5;
-}
-
-#main {
-  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .field {
+  width: 70%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 10px;
 }
 
-.bench-row, .battle-row {
+.battle-row, .bench-row {
   display: flex;
   justify-content: center;
-  margin: 10px 0;
+  margin: 5px 0;
 }
 
-.slot, .battle-slot {
-  width: 100px;
-  height: 140px;
-  border: 1px solid #aaa;
-  margin: 0 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  cursor: pointer;
+.slot {
+  width: 80px;
+  height: 120px;
+  border: 1px solid #333;
+  margin: 5px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: #f8f8f8;
 }
 
+.slot .name { font-weight: bold; }
+.slot .hp { font-size: 12px; }
+.slot .energy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  justify-content: center;
+  margin-top: 4px;
+}
 .energy-icon {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  margin: 2px;
+  display: inline-block;
 }
 
 .timeline {
-  margin-top: 20px;
-}
-
-#card-selector {
-  display: none;
-  background: white;
-  padding: 10px;
-  border: 1px solid #aaa;
-  max-height: 300px;
+  width: 30%;
+  max-height: 100vh;
   overflow-y: auto;
+  background: #eee;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-.context-menu {
-  display: none;
-  position: absolute;
-  background: white;
-  border: 1px solid #aaa;
-  padding: 5px;
-  z-index: 100;
+.modal {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 2px solid #333;
+  padding: 10px;
+  z-index: 10;
 }
-
-.energy-selector {
+.hidden {
   display: none;
-  position: absolute;
-  background: white;
-  border: 1px solid #aaa;
-  padding: 5px;
-  z-index: 100;
-  display: flex;
-  gap: 5px;
 }
