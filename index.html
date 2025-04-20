@@ -1,73 +1,34 @@
-body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ポケモンカード風サイト</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="field">
+    <div class="opponent-bench bench-row" data-owner="opponent"></div>
+    <div class="opponent-battle battle-row" data-owner="opponent"></div>
+    <div class="player-battle battle-row" data-owner="player"></div>
+    <div class="player-bench bench-row" data-owner="player"></div>
+  </div>
 
-.field {
-  width: 70%;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
+  <div class="timeline" id="timeline">
+    <h2>タイムライン</h2>
+    <ul id="logList"></ul>
+  </div>
 
-.battle-row, .bench-row {
-  display: flex;
-  justify-content: center;
-  margin: 5px 0;
-}
+  <div id="cardList" class="modal hidden"></div>
+  <div id="actionMenu" class="modal hidden">
+    <button onclick="openEnergySelect()">エネルギーを付ける</button>
+    <button onclick="adjustHP()">体力を操作する</button>
+    <button onclick="sendToTrash()">トラッシュに送る</button>
+    <button onclick="closeActionMenu()">キャンセル</button>
+  </div>
+  <div id="energySelect" class="modal hidden"></div>
 
-.slot {
-  width: 80px;
-  height: 120px;
-  border: 1px solid #333;
-  margin: 5px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background-color: #f8f8f8;
-}
-
-.slot .name { font-weight: bold; }
-.slot .hp { font-size: 12px; }
-.slot .energy {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-  justify-content: center;
-  margin-top: 4px;
-}
-.energy-icon {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.timeline {
-  width: 30%;
-  max-height: 100vh;
-  overflow-y: auto;
-  background: #eee;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.modal {
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border: 2px solid #333;
-  padding: 10px;
-  z-index: 10;
-}
-.hidden {
-  display: none;
-}
+  <script src="cards.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
