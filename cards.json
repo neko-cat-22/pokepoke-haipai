@@ -1,6 +1,0 @@
-const cardDatabase = [
-  { id: 1, name: "フシギダネ", type: "草", hp: 60, category: "ポケモン", stage: "たね" },
-  { id: 2, name: "ヒトカゲ", type: "炎", hp: 50, category: "ポケモン", stage: "たね" },
-  { id: 3, name: "ゼニガメ", type: "水", hp: 60, category: "ポケモン", stage: "たね" },
-  { id: 4, name: "ピカチュウ", type: "雷", hp: 70, category: "ポケモン", stage: "たね" }
-];
