@@ -1,127 +1,152 @@
-const field = document.querySelector('.field');
-const cardList = document.getElementById('cardList');
-const actionMenu = document.getElementById('actionMenu');
-const energySelect = document.getElementById('energySelect');
-const logList = document.getElementById('logList');
-
-let selectedSlot = null;
-let boardState = {};  // スロットごとの状態記録
-
-const energyColors = {
-  "草": "green", "炎": "red", "水": "deepskyblue", "雷": "gold",
-  "超": "purple", "闘": "orange", "悪": "darkblue", "鋼": "silver"
+const fields = {
+  "opponent-bench": [],
+  "opponent-battle": [],
+  "player-battle": [],
+  "player-bench": [],
 };
 
-function initializeField() {
-  document.querySelectorAll('.bench-row, .battle-row').forEach(row => {
+const sampleCards = [
+  { name: "フシギダネ", type: "grass", hp: 60, kind: "ポケモン", stage: "たね" },
+  { name: "ヒトカゲ", type: "fire", hp: 50, kind: "ポケモン", stage: "たね" },
+  { name: "ゼニガメ", type: "water", hp: 60, kind: "ポケモン", stage: "たね" },
+  { name: "ピカチュウ", type: "electric", hp: 70, kind: "ポケモン", stage: "たね" }
+];
+
+const energyColors = {
+  grass: "green",
+  fire: "red",
+  water: "deepskyblue",
+  electric: "gold",
+  psychic: "purple",
+  fighting: "orange",
+  dark: "navy",
+  steel: "silver"
+};
+
+let selectedPosition = null;
+
+window.onload = () => {
+  for (let id in fields) {
+    const container = document.getElementById(id);
     for (let i = 0; i < 3; i++) {
-      if (row.classList.contains('battle-row') && i > 0) continue;
-      const slot = document.createElement('div');
-      slot.classList.add('slot');
-      slot.dataset.owner = row.dataset.owner;
-      slot.addEventListener('click', () => handleSlotClick(slot));
-      row.appendChild(slot);
+      const div = document.createElement("div");
+      div.className = "card-slot";
+      div.addEventListener("click", () => handleSlotClick(id, i));
+      container.appendChild(div);
+      fields[id].push(null);
     }
-  });
-}
-function handleSlotClick(slot) {
-  selectedSlot = slot;
-  if (!slot.dataset.cardId) {
-    showCardSelection();
+  }
+};
+
+function handleSlotClick(fieldId, index) {
+  const card = fields[fieldId][index];
+  selectedPosition = { fieldId, index };
+
+  if (!card) {
+    showCardSelector();
   } else {
-    openActionMenu();
+    showActionMenu();
   }
-}
-function showCardSelection() {
-  cardList.innerHTML = '';
-  cardList.classList.remove('hidden');
-  cardDatabase.forEach(card => {
-    const div = document.createElement('div');
-    div.textContent = `${card.name}(${card.hp})`;
-    div.addEventListener('click', () => selectCard(card));
-    cardList.appendChild(div);
-  });
-}
-function selectCard(card) {
-  cardList.classList.add('hidden');
-  selectedSlot.dataset.cardId = card.id;
-  boardState[selectedSlot.dataset.slotId] = {
-    ...card,
-    energies: [],
-    currentHP: card.hp
-  };
-  renderSlot(selectedSlot, card);
-  logAction(`${card.name} を場に出した`);
-}
-function renderSlot(slot, card) {
-  slot.innerHTML = `
-    <div class="name">${card.name}</div>
-    <div class="hp">HP: ${card.hp}</div>
-    <div class="energy"></div>
-  `;
-  const energyArea = slot.querySelector('.energy');
-  boardState[slot.dataset.slotId]?.energies.forEach(type => {
-    const dot = document.createElement('div');
-    dot.className = 'energy-icon';
-    dot.style.background = energyColors[type];
-    energyArea.appendChild(dot);
-  });
-}
-function openActionMenu() {
-  actionMenu.classList.remove('hidden');
-}
-function closeActionMenu() {
-  actionMenu.classList.add('hidden');
-}
-function openEnergySelect() {
-  closeActionMenu();
-  energySelect.innerHTML = '';
-  for (let type in energyColors) {
-    const btn = document.createElement('button');
-    btn.textContent = type;
-    btn.style.background = energyColors[type];
-    btn.addEventListener('click', () => addEnergyToCard(type));
-    energySelect.appendChild(btn);
-  }
-  const cancel = document.createElement('button');
-  cancel.textContent = 'キャンセル';
-  cancel.onclick = () => energySelect.classList.add('hidden');
-  energySelect.appendChild(cancel);
-  energySelect.classList.remove('hidden');
-}
-function addEnergyToCard(type) {
-  energySelect.classList.add('hidden');
-  const cardId = selectedSlot.dataset.cardId;
-  const slotKey = selectedSlot.dataset.slotId;
-  if (!boardState[slotKey]) return;
-  boardState[slotKey].energies.push(type);
-  renderSlot(selectedSlot, boardState[slotKey]);
-  logAction(`${boardState[slotKey].name} に ${type} エネルギーを付けた`);
-}
-function adjustHP() {
-  closeActionMenu();
-  const newHP = prompt("HPを設定してください:");
-  const slotKey = selectedSlot.dataset.slotId;
-  if (boardState[slotKey]) {
-    boardState[slotKey].currentHP = Number(newHP);
-    renderSlot(selectedSlot, boardState[slotKey]);
-    logAction(`${boardState[slotKey].name} のHPを${newHP}に変更`);
-  }
-}
-function sendToTrash() {
-  const slotKey = selectedSlot.dataset.slotId;
-  if (boardState[slotKey]) {
-    logAction(`${boardState[slotKey].name} をトラッシュに送った`);
-    delete boardState[slotKey];
-    selectedSlot.innerHTML = '';
-    delete selectedSlot.dataset.cardId;
-    closeActionMenu();
-  }
-}
-function logAction(text) {
-  const li = document.createElement('li');
-  li.textContent = text;
-  logList.appendChild(li);
 }
 
-initializeField();
+function showCardSelector() {
+  const selector = document.getElementById("cardSelector");
+  selector.innerHTML = "";
+  selector.style.display = "flex";
+
+  sampleCards.forEach(card => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `<strong>${card.name}</strong><div class="hp">HP: ${card.hp}</div>`;
+    div.onclick = () => {
+      placeCard(selectedPosition.fieldId, selectedPosition.index, {
+        ...card,
+        energy: [],
+        currentHp: card.hp
+      });
+      selector.style.display = "none";
+    };
+    selector.appendChild(div);
+  });
+}
+
+function placeCard(fieldId, index, card) {
+  fields[fieldId][index] = card;
+  updateField();
+  logAction(`${card.name} を ${fieldId} に出した`);
+}
+
+function updateField() {
+  for (let fieldId in fields) {
+    const container = document.getElementById(fieldId);
+    const slots = container.children;
+    fields[fieldId].forEach((card, i) => {
+      const slot = slots[i];
+      slot.innerHTML = "";
+      slot.className = "card-slot";
+      if (card) {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <strong>${card.name}</strong>
+          <div class="hp">HP: ${card.currentHp}</div>
+          <div class="energy-icons">
+            ${card.energy.map(e => `<div class="energy ${e}" style="background:${energyColors[e]}"></div>`).join("")}
+          </div>
+        `;
+        slot.appendChild(div);
+      }
+    });
+  }
+}
+
+function showActionMenu() {
+  document.getElementById("actionMenu").style.display = "flex";
+}
+
+function showEnergySelector() {
+  document.getElementById("actionMenu").style.display = "none";
+  const selector = document.getElementById("energySelector");
+  selector.innerHTML = "";
+  selector.style.display = "flex";
+
+  Object.keys(energyColors).forEach(type => {
+    const div = document.createElement("div");
+    div.className = `energy ${type}`;
+    div.style.background = energyColors[type];
+    div.onclick = () => {
+      const { fieldId, index } = selectedPosition;
+      fields[fieldId][index].energy.push(type);
+      updateField();
+      logAction(`${fields[fieldId][index].name} に ${type} エネルギーを付けた`);
+      selector.style.display = "none";
+    };
+    selector.appendChild(div);
+  });
+}
+
+function adjustHP() {
+  const newHP = prompt("現在のHPを入力してください");
+  if (!newHP) return;
+  const { fieldId, index } = selectedPosition;
+  fields[fieldId][index].currentHp = parseInt(newHP);
+  updateField();
+  logAction(`${fields[fieldId][index].name} のHPを ${newHP} に変更`);
+  document.getElementById("actionMenu").style.display = "none";
+}
+
+function sendToTrash() {
+  const { fieldId, index } = selectedPosition;
+  const card = fields[fieldId][index];
+  fields[fieldId][index] = null;
+  updateField();
+  logAction(`${card.name} をトラッシュに送った`);
+  document.getElementById("actionMenu").style.display = "none";
+}
+
+function logAction(text) {
+  const timeline = document.getElementById("timeline");
+  const p = document.createElement("div");
+  p.textContent = text;
+  timeline.appendChild(p);
+}
