@@ -7,28 +7,22 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="field">
-    <div class="opponent-bench bench-row" data-owner="opponent"></div>
-    <div class="opponent-battle battle-row" data-owner="opponent"></div>
-    <div class="player-battle battle-row" data-owner="player"></div>
-    <div class="player-bench bench-row" data-owner="player"></div>
+  <div class="main">
+    <div class="field" id="opponent-bench"></div>
+    <div class="field" id="opponent-battle"></div>
+    <div class="field" id="player-battle"></div>
+    <div class="field" id="player-bench"></div>
   </div>
+  <div class="timeline" id="timeline"></div>
 
-  <div class="timeline" id="timeline">
-    <h2>タイムライン</h2>
-    <ul id="logList"></ul>
-  </div>
-
-  <div id="cardList" class="modal hidden"></div>
-  <div id="actionMenu" class="modal hidden">
-    <button onclick="openEnergySelect()">エネルギーを付ける</button>
+  <div class="card-selector" id="cardSelector"></div>
+  <div class="action-menu" id="actionMenu">
+    <button onclick="showEnergySelector()">エネルギーを付ける</button>
     <button onclick="adjustHP()">体力を操作する</button>
     <button onclick="sendToTrash()">トラッシュに送る</button>
-    <button onclick="closeActionMenu()">キャンセル</button>
   </div>
-  <div id="energySelect" class="modal hidden"></div>
+  <div class="energy-selector" id="energySelector"></div>
 
-  <script src="cards.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
